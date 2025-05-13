@@ -1,0 +1,243 @@
+!pip install gradio pytesseract pillow
+!apt install tesseract-ocr -y
+medicine_db = {
+    # --- Existing Diseases ---
+    "diabetes": [
+        "Metformin 500mg - twice daily before meals",
+        "Insulin Glargine - once daily at bedtime"
+    ],
+    "skin cancer": [
+        "Imiquimod cream - apply once daily",
+        "Fluorouracil topical - apply as prescribed"
+    ],
+    "pneumonia": [
+        "Azithromycin 500mg - once daily",
+        "Ceftriaxone 1g IV - twice daily"
+    ],
+    "tuberculosis": [
+        "Rifampicin 600mg - once daily",
+        "Isoniazid 300mg - once daily"
+    ],
+    "covid": [
+        "Paracetamol 500mg - every 6 hours as needed",
+        "Favipiravir 1800mg on Day 1, then 800mg BID"
+    ],
+    "color blindness": [
+        "No curative medicine; recommend color-filter glasses"
+    ],
+    "glaucoma": [
+        "Timolol eye drops - twice daily",
+        "Latanoprost eye drops - once daily at night"
+    ],
+    "cataract": [
+        "No medication; surgical lens replacement recommended"
+    ],
+    "diabetic retinopathy": [
+        "Anti-VEGF injections - monthly",
+        "Laser photocoagulation (refer ophthalmologist)"
+    ],
+    "malaria": [
+        "Artemether + Lumefantrine - 80mg/480mg twice daily",
+        "Chloroquine phosphate - 600mg then taper"
+    ],
+    "leukemia": [
+        "Imatinib 400mg - once daily",
+        "Chemotherapy (as per oncologist)"
+    ],
+    "liver disease": [
+        "Ursodeoxycholic acid 300mg - twice daily",
+        "Hepamerz granules - once daily in water"
+    ],
+    "kidney disease": [
+        "Furosemide 40mg - once daily",
+        "Sodium Bicarbonate tablets - as needed"
+    ],
+    "heart disease": [
+        "Aspirin 75mg - once daily",
+        "Atorvastatin 10mg - at night"
+    ],
+    "anemia": [
+        "Ferrous Sulfate 325mg - once or twice daily",
+        "Vitamin B12 Injection - weekly for 1 month"
+    ],
+    "parkinson's": [
+        "Levodopa + Carbidopa - 3 times a day",
+        "Ropinirole - as prescribed"
+    ],
+    "eye diseases": [
+        "Artificial tears - 4 times daily",
+        "Antibiotic drops (Moxifloxacin) - as prescribed"
+    ],
+    "skin diseases": [
+        "Hydrocortisone cream - apply twice daily",
+        "Antifungal cream (Clotrimazole) - for fungal infections"
+    ],
+
+    # --- New Additions ---
+    "dental": [
+        "Amoxicillin 500mg - three times a day for 5 days",
+        "Ibuprofen 400mg - as needed for pain",
+        "Chlorhexidine mouthwash - twice daily"
+    ],
+    "ear infection": [
+        "Amoxicillin-Clavulanate 875mg - twice daily",
+        "Ciprofloxacin ear drops - twice daily"
+    ],
+    "alzheimer": [
+        "Donepezil 5mg - once daily at bedtime",
+        "Memantine 10mg - once daily"
+    ],
+    "sleep disorder": [
+        "Melatonin 3mg - 30 minutes before sleep",
+        "Zolpidem 5mg - as prescribed"
+    ],
+    "depression": [
+        "Sertraline 50mg - once daily",
+        "Fluoxetine 20mg - once daily in morning"
+    ],
+    "anxiety": [
+        "Alprazolam 0.25mg - as needed",
+        "Buspirone 5mg - twice daily"
+    ],
+    "autism spectrum disorder": [
+        "Risperidone 0.5mg - once daily (for irritability)",
+        "Occupational therapy and behavioral therapy recommended"
+    ],
+    "brain stroke": [
+        "Aspirin 150mg - once daily",
+        "Atorvastatin 20mg - once daily",
+        "Clopidogrel 75mg - once daily"
+    ],
+    "brain tumor": [
+        "Dexamethasone 4mg - to reduce swelling",
+        "Temozolomide (for glioblastoma) - consult oncologist"
+    ],
+    "xray": [
+        "Diagnostic only — refer findings to specialist"
+    ],
+    "ct scan": [
+        "Diagnostic only — follow with neurologist or specialist"
+    ],
+    "mri": [
+        "Diagnostic only — interpretation by radiologist required"
+    ]
+}
+!pip install gradio pytesseract opencv-python
+!apt install tesseract-ocr -y
+import gradio as gr
+import pytesseract
+import cv2
+import numpy as np
+from PIL import Image
+
+# Medicine database (already created as medicine_db)
+
+# OCR + Analyzer Function
+def analyze_prescription(image):
+    # Convert image to grayscale for better OCR
+    gray = cv2.cvtColor(np.array(image), cv2.COLOR_BGR2GRAY)
+    text = pytesseract.image_to_string(gray)
+
+    # Find keywords that match disease names
+    found_diseases = []
+    for disease in medicine_db.keys():
+        if disease.lower() in text.lower():
+            found_diseases.append(disease)
+
+    # Prepare output
+    if found_diseases:
+        results = "🩺 **Detected Disease(s):**\n"
+        for dis in found_diseases:
+            results += f"\n🔹 **{dis.upper()}**:\n"
+            for med in medicine_db[dis]:
+                results += f"   - {med}\n"
+    else:
+        results = "❌ No recognized disease found in prescription."
+
+    return results
+
+# Gradio interface
+iface = gr.Interface(
+    fn=analyze_prescription,
+    inputs=gr.Image(type="pil", label="Upload Handwritten Prescription"),
+    outputs=gr.Markdown(label="Suggested Medicines"),
+    title="🧠 Doctor Prescription Analyzer",
+    description="Upload a handwritten doctor's prescription image. The system will extract and suggest possible medicines using AI."
+)
+iface.launch()
+!pip install gradio opencv-python
+!apt install tesseract-ocr -y
+# Example medicine database (add more as needed)
+medicine_db = {
+    "Diabetes": ["Metformin", "Insulin", "Glipizide"],
+    "Fever": ["Paracetamol", "Ibuprofen"],
+    "Infection": ["Azithromycin", "Amoxicillin"],
+    "Depression": ["Fluoxetine", "Sertraline"],
+    "Sleep Disorder": ["Melatonin", "Zolpidem"],
+    "Autism Spectrum Disorder": ["Risperidone"],
+    "Alzheimer": ["Donepezil", "Memantine"],
+    "Malaria": ["Chloroquine", "Artemether"],
+    "Brain Tumor": ["Temozolomide"],
+    "Ear Infection": ["Ciprofloxacin", "Neomycin"],
+    "Dental Infection": ["Amoxicillin", "Clindamycin"],
+    "Brain Stroke": ["Aspirin", "Atorvastatin"]
+}
+
+# Reverse mapping for medicine to disease
+medicine_to_disease = {}
+for disease, meds in medicine_db.items():
+    for med in meds:
+        med_lower = med.lower()
+        if med_lower not in medicine_to_disease:
+            medicine_to_disease[med_lower] = []
+        medicine_to_disease[med_lower].append(disease)
+import pytesseract
+import cv2
+import numpy as np
+import difflib
+
+def match_medicine(word):
+    all_meds = list(medicine_to_disease.keys())
+    closest = difflib.get_close_matches(word.lower(), all_meds, n=1, cutoff=0.7)
+    return closest[0] if closest else None
+
+def analyze_prescription_image(image):
+    # Convert to grayscale
+    image_np = np.array(image)
+    gray = cv2.cvtColor(image_np, cv2.COLOR_BGR2GRAY)
+
+    # OCR config
+    custom_config = r'--oem 3 --psm 6'
+    text = pytesseract.image_to_string(gray, config=custom_config)
+
+    # Normalize text
+    detected_medicines = [word.strip().lower() for word in text.split()]
+    
+    # Match and display diseases
+    results = ""
+    found = False
+    for med in detected_medicines:
+        matched = match_medicine(med)
+        if matched:
+            found = True
+            results += f"💊 **{matched.title()}** is used for:\n"
+            for disease in medicine_to_disease[matched]:
+                results += f"   - {disease}\n"
+
+    if not found:
+        results = "❌ No recognized disease found in prescription.\n\n"
+        results += f"📝 OCR Extracted Text:\n{text}"
+
+    return results
+import gradio as gr
+from PIL import Image
+
+interface = gr.Interface(
+    fn=analyze_prescription_image,
+    inputs=gr.Image(type="pil", label="Upload Prescription (Handwritten Image)"),
+    outputs=gr.Markdown(label="Possible Diagnoses"),
+    title="🧠 Doctor Prescription Analyzer",
+    description="Upload an image of a handwritten prescription containing medicine names. This tool will identify possible diseases being treated."
+)
+
+interface.launch()
