@@ -11,4 +11,9 @@ Medicine name in a different form (e.g., "PCM" instead of "Paracetamol").
 
 The medicine name is not present in the medicine_db.
 So I will try to improve the OCR accuracy and come back with the response as it need time to deal with this.
+This is the possible result which I get 
+
+
+<img width="1260" alt="image" src="https://github.com/user-attachments/assets/1fa5c303-54bd-4e9f-9be9-1c8f3d2f788d" />
+
 
