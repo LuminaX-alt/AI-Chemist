@@ -1,0 +1,32 @@
+!pip install gradio
+# Simple dictionary: disease/symptom -> [medicines]
+medicine_db = {
+    "fever": ["Paracetamol 500mg - twice daily"],
+    "cold": ["Cetirizine 10mg - once daily"],
+    "headache": ["Ibuprofen 400mg - as needed"],
+    "infection": ["Amoxicillin 500mg - thrice daily"],
+    "diabetes": ["Metformin 500mg - twice daily before meals"],
+    "blood pressure": ["Amlodipine 5mg - once daily"],
+    "cough": ["Dextromethorphan syrup - 10ml thrice daily"]
+}
+def analyze_prescription(text):
+    text = text.lower()
+    results = []
+    for condition, meds in medicine_db.items():
+        if condition in text:
+            results.extend(meds)
+    if results:
+        return "Recommended Medicine(s):\n" + "\n".join(results)
+    else:
+        return "No matching condition found. Please check the prescription."
+import gradio as gr
+
+with gr.Blocks() as demo:
+    gr.Markdown("## 🩺 Doctor Prescription Analyzer")
+    prescription_input = gr.Textbox(label="Enter Doctor's Prescription", lines=5, placeholder="E.g. Patient has fever and cough...")
+    output = gr.Textbox(label="Suggested Medicines")
+
+    analyze_btn = gr.Button("Analyze Prescription")
+    analyze_btn.click(fn=analyze_prescription, inputs=prescription_input, outputs=output)
+
+demo.launch()
